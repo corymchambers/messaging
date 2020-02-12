@@ -3,6 +3,7 @@ import { StyleSheet, Image, View, Alert, TouchableHighlight } from 'react-native
 
 import Status from './components/Status'
 import MessageList from './components/MessageList'
+import Toolbar from './components/Toolbar'
 
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils'
 
@@ -18,7 +19,42 @@ export default class App extends Component {
         longitude: -122.4324
       })
     ],
-    fullscreenImageId: null
+    fullscreenImageId: null,
+    isInputFocused: false
+  }
+
+  handlePressToolbarCamera = () => {
+
+  }
+
+  handlePressToolbarLocation = () => {
+    const { messages } = this.state
+
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { coords: { latitude, longitude}} = position
+
+      this.setState({
+        messages: [
+          createLocationMessage({
+            latitude,
+            longitude
+          }),
+          ...messages
+        ]
+      })
+    })
+  }
+
+  handleChangeFocus = (isFocused) => {
+    this.setState({ isInputFocused: isFocused })
+  }
+
+  handleSubmit = () => {
+    const { messages } = this.state
+
+    this.setState({
+      messages: [createTextMessage(text), ...messages]
+    })
   }
 
   dismissFullscreenImage = () => {
@@ -52,7 +88,10 @@ export default class App extends Component {
         )
         break;
       case 'image':
-        this.setState({ fullscreenImageId: id })
+        this.setState({
+          fullscreenImageId: id,
+          isInputFocused: false
+        })
         break;
       default:
         break;
@@ -79,8 +118,17 @@ export default class App extends Component {
   }
 
   renderToolbar() {
+    const { isInputFocused } = this.state
     return (
-      <View style={styles.toolbar}></View>
+      <View style={styles.toolbar}>
+        <Toolbar
+          isFocused={isInputFocused}
+          onSubmit={this.handleSubmit}
+          onChangeFocus={this.handleChangeFocus}
+          onPressCamera={this.handlePressToolbarCamera}
+          onPressLocation={this.handlePressToolbarLocation}
+        />
+      </View>
     )
   }
 
