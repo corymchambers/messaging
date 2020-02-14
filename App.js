@@ -4,6 +4,7 @@ import { StyleSheet, Image, View, Alert, TouchableHighlight } from 'react-native
 import Status from './components/Status'
 import MessageList from './components/MessageList'
 import Toolbar from './components/Toolbar'
+import ImageGrid from './components/ImageGrid'
 
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils'
 
@@ -98,6 +99,14 @@ export default class App extends Component {
     }
   }
 
+  handlePressImage = (uri) => {
+    const { messages } = this.state
+
+    this.setState({
+      messages: [createImageMessage(uri), ...messages]
+    })
+  }
+
   renderMessageList() {
     const { messages } = this.state
 
@@ -113,7 +122,9 @@ export default class App extends Component {
 
   renderInputMethodEditor() {
     return (
-      <View style={styles.inputMethodEditor}></View>
+      <View style={styles.inputMethodEditor}>
+        <ImageGrid onPressImage={this.handlePressImage} />
+      </View>
     )
   }
 
